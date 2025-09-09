@@ -28,7 +28,6 @@ class CompletionRunner:
     def __init__(self, PS1="@/", directory=None, init_files=None, init_commands=None, logfile=None):
         self.PS1 = PS1
         env = os.environ.copy()
-        # env['PS1']=self.PS1
         env['TERM']='dumb'
         self.bash = pexpect.spawn(
             "bash --norc",

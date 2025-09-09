@@ -1,0 +1,61 @@
+source /usr/share/bash-completion/bash_completion
+@COMPTEST@source /usr/share/bash-completion/bash_completion
+@COMPTEST@source /fs/homeu2/eccc/mrd/ords/rpnsi/phc001/Repositories/github.com/philippecarphin/git-colon-paths/etc/profile.d/git-colon-path-support.bash
+source /fs/homeu2/eccc/mrd/ords/rpnsi/phc001/Repositories/github.com/philippecarphin/git-colon-paths/etc/profile.d/git-colon-path-support.bash
+@COMPTEST@bind 'set visible-stats off'
+bind 'set visible-stats off'
+@COMPTEST@bind 'set mark-directories off'
+bind 'set mark-directories off'
+@COMPTEST@bind 'set echo-control-characters off'
+bind 'set echo-control-characters off'
+@COMPTEST@complete -F _gcps_complete_cd cd
+complete -F _gcps_complete_cd cd
+@COMPTEST@complete -F _gcps_complete_files vim
+complete -F _gcps_complete_files vim
+@COMPTEST@bind "set page-completions off"
+bind "set page-completions off"
+@COMPTEST@bind "set completion-query-items -1"
+bind "set completion-query-items -1"
+@COMPTEST@bind "set completion-display-width 0"
+bind "set completion-display-width 0"
+@COMPTEST@bind "set show-all-if-ambiguous"
+bind "set show-all-if-ambiguous"
+@COMPTEST@bind "set bell-style none"
+bind "set bell-style none"
+@COMPTEST@bind "set colored-completion-prefix off"
+bind "set colored-completion-prefix off"
+@COMPTEST@bind "set colored-stats off"
+bind "set colored-stats off"
+@COMPTEST@cd ../	cd ../
+cwd
+dir-with-only-files
+empty-dir
+non-empty-dir
+@COMPTEST@cd ../
+@COMPTEST@complete -F _gcps_complete_cd cd
+complete -F _gcps_complete_cd cd
+@COMPTEST@cd :/test/mock_files/	cd :/test/mock_files/
+cwd
+dir-with-only-files
+empty-dir
+non-empty-dir
+@COMPTEST@cd :/test/mock_files/
+@COMPTEST@cd :	cd :/
+@COMPTEST@cd :/test/mock_files	cd :/test/mock_files/
+@COMPTEST@cd :/test/mock_files/empt	cd :/test/mock_files/empty-dir/ 
+@COMPTEST@cd :/test/mock_files/non-empt	cd :/test/mock_files/non-empty-dir/
+@COMPTEST@cd :/test/mock_files/non-empt	cd :/test/mock_files/non-empty-dir/
+@COMPTEST@cd :/test/mock_files/dir-with-only-f	cd :/test/mock_files/dir-with-only-files/ 
+@COMPTEST@cd ../	cd ../
+cwd
+dir-with-only-files
+empty-dir
+non-empty-dir
+@COMPTEST@cd ../
+@COMPTEST@vim :/test/mock_files/dir-with-only-files/ap	vim :/test/mock_files/dir-with-only-files/ap
+apple
+apricot
+@COMPTEST@vim :/test/mock_files/dir-with-only-files/ap
+@COMPTEST@vim :/test/mock_files/dir-with-only-files/ba	vim :/test/mock_files/dir-with-only-files/banana 
+@COMPTEST@vim :/test/mock_files/dir-with-only-files/noexist	vim :/test/mock_files/dir-with-only-files/noexist
+@COMPTEST@exit
