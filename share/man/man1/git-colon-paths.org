@@ -1,0 +1,128 @@
+#+TITLE: git-colon-paths
+
+* NAME
+
+#+begin_src shell
+git-colon-paths
+#+end_src
+
+* SYNOPSIS
+
+** High level functions
+#+begin_src shell
+_gcps_wrap_command CMD [ARGS...]
+alias CMD='_gpsc_wrap_command CMD'
+complete -F _gcps_complete_colon_files CMD
+complete -F _gcps_complete_colon_dirs  CMD
+complete -F _gcps_complete_cd CMD
+#+end_src
+
+** Low level functions
+
+#+begin_src shell
+_gcps_complete_paths (-f|-d)
+_gcps_get_root_superproject [DIR]
+_gcps_resolve_path
+_gcps_complete_normal_paths [-d]
+_gcps_complete_colon_paths [-d]
+_gcps_handle_single_candidate PREFIX (-f|-d) [HANDLE_CDPATH]
+#+end_src
+
+* FUNCTIONS
+
+** High level functions
+
+*** =_gcps_wrap_command CMD [ARGS...]=
+
+Call =CMD NEW_ARGS...= where =NEW_ARGS= is the original argument list with all
+arguments beginning with =:= replaced by the absolute path of the root of the
+current git repo.
+
+All arguments not starting with =:= are left unchanged.
+
+#+begin_src shell
+_gcps_wrap_command cd -P :/etc/profile.d
+#+end_src
+
+is equivalent to
+
+#+begin_src shell
+cd -P ${repo_root}/etc/profile.d
+#+end_src
+
+*** =_gcps_complete_files=
+
+Bash completion function completing paths beginning with =:= with *file paths*
+relative to the root of the repo.
+
+For paths not beginning with =:=, finding candidates is delegated to the
+standard function =_filedir= provided by Bash Completion.
+
+*** =_gcps_complete_dirs=
+
+Bash completion function completing paths beginning with =:= with *directories* relative to the root of the repo.
+
+For paths not beginning with =:=, finding candidates is delegated to the
+standard function =_filedir -d= provided by Bash Completion.
+
+*** =_gcps_complete_cd=
+
+This function is similar to =_gcps_complete_dirs= except that for paths not
+beginning with =:=, instead of using =_filedir=, completion is delegated to
+=_cd= which is also a standard function provided by Bash Completion that also
+handles the =CDPATH= environment variable.
+
+** Low level functions
+
+These functions were meant as implementation details but could be useful on their
+own.
+
+The functions =_gcps_complete_colon_paths= and =_gcps_handle_single_candidate=
+rely on this code having been run by the top level functions:
+#+begin_src shell
+compopt -o filenames
+local cur prev words cword
+_init_completion
+#+end_src
+so this needs to be considered.  Also since the =_gpsc_complete_*= functions
+call =compopt=, they can only be called in the context of completion.
+
+*** =_gcps_complete_paths [-d]=
+
+Used to centralize code of =_gcps_complete_files= and =_gcps_complete_dirs=:
+#+begin_src shell
+_gcps_complete_dirs(){ _gcps_complete_paths -d ; }
+_gcps_complete_files(){ _gcps_complete_paths ; }
+#+end_src
+
+*** =_gcps_get_root_superproject [DIR]=
+
+Get the root of the git top level superproject by repeatedly calling
+=git rev-parse --show-superproject-working-tree=
+
+*** =_gcps_resolve_colon_path=
+
+Prints the path with the =:= replaced with the superproject root.
+
+*** =_gcps_complete_normal_paths [-d]=
+
+Complete paths not beginning with =:=.  Delegates to =_filedir [-d]= but also
+calls =_gcps_handle_single_candidate "" [-d]=.
+
+*** =_gcps_complete_colon_paths [-d]=
+
+Complete paths beginning with =:= and calls =_gcps_handle_single_candidate
+${repo_root} [-d]=.
+
+*** =_gcps_handle_single_candidate PREFIX (-f|-d) [HANDLE_CDPATH]=
+
+Force the end of completion by ensuring a space is added after the argument
+currently being completed when completion cannot continue further.
+- When completing directories, completion ends when we have a single candidate
+  that is a directory that exists and does not contain any subdirectories
+- When completing files, completion ends when we have a single candidate that is
+  either a file or an empty directory.
+otherwise completion can continue.
+
+The function checks the number of candidates in =COMPREPLY= so it can be called
+unconditionally at the end of any completion function.
