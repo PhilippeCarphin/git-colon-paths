@@ -1,0 +1,81 @@
+#+TITLE: git-colon-path
+
+* Overview
+
+This repo provides wrappers for commands to make them handle paths beginning
+with =:= by taking =:= to represent the root of the repo.  For example
+
+#+begin_src shell
+#start at repo root
+cd share/man/
+cd :/etc/profile.d
+#+end_src
+
+This repo provides shell functions to wrap any command so that it handles these
+paths:
+
+#+begin_src shell
+alias cd='_gcps_wrap_command cd'
+#+end_src
+
+and completion functions to make the shell autocomplete work with these paths:
+
+#+begin_src shell
+complete -F _gcps_complete_colon_dirs cd
+#+end_src
+
+* Extra feature
+
+The completion function =_gcps_complete_colon_dirs= has an extra feature that I
+always wished the regular completion for =cd= had:  it adds a space when
+completion of directories cannot continue.
+
+Default path completion adds a space when the argument is a file:
+#+begin_src shell
+vim path/to/a-file[]
+vim path/to/a-file []
+#+end_src
+because when the path is a file we know that completion is done.  However it
+does not do this when completing directories even when completion cannot
+continue.
+
+With =cd=,
+#+begin_src shell
+cd path/to/dir[]
+#+end_src
+completion cannot continue if =path/to/dir= contains no subdirectories:
+#+begin_src shell
+cd path/to/dir-containing-no-subdirectories[]
+cd path/to/dir-containing-no-subdirectories []
+#+end_src
+so rather than saying "path completion is done if we have one candidate and it
+is a file", we do
+- path completion is done if the current word is a file
+  or an empty directory,
+- directory completion is done if the current word is a directory containing no
+  subdirectories.
+
+* Usage and Functions
+
+#+begin_src shell
+alias CMD='_gpsc_wrap_command CMD'
+complete -F _gcps_complete_colon_files CMD
+complete -F _gcps_complete_colon_dirs  CMD
+complete -F _gcps_complete_cd CMD
+#+end_src
+
+See =man 1 git-colon-paths= or [[share/man/man1/git-colon-paths.org]].
+
+* Installation
+
+Clone this repo and source =etc/profile.d/git-colon-path-support.$SHELL= at
+shell startup where =$SHELL= is either =bash= or =zsh=.
+
+Run =make= and add =${this_repo}/share/man= to =MANPATH= to get =man
+git-colon-paths=.
+
+* Caveats
+
+I use BASH on my home computer even though ZSH is the default shell for mac
+because we use BASH so the ZSH version is not up to date with the BASH
+version.
