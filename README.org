@@ -21,7 +21,8 @@ alias cd='_gcps_wrap_command cd'
 and completion functions to make the shell autocomplete work with these paths:
 
 #+begin_src shell
-complete -F _gcps_complete_colon_dirs cd
+complete -F _gcps_complete_cd cd
+complete -F _gcps_complete_files vim
 #+end_src
 
 * Extra feature
@@ -66,6 +67,28 @@ complete -F _gcps_complete_cd CMD
 
 See =man 1 git-colon-paths= or [[share/man/man1/git-colon-paths.org]].
 
+The three =_gcps_complete*= functions listed above work by setting the
+=COMPREPLY= array.  They can be called inside other completion functions:
+
+#+begin_src shell
+_complete_my_cmd(){
+    local cur prev words cword
+    _init_completion || return
+
+    if [[ ${cur} == -* ]] ; then
+        COMPREPLY=(-d -F --directory --config-file -y --yes --fruit)
+    else
+        case ${prev} in
+            -d,--dir)  _gcps_complete_dirs ;;
+            -F,--file) _gcps_complete_files ;;
+            --fruit) COMPREPLY=($(compgen -W "apple apricot bananna cherry" -- "${cur}") ;;
+            *) # prev is either an option that takes no argument or not an option
+                _gcps_complete_files ;;
+        esac
+    fi
+}
+#+end_src
+
 * Installation
 
 Clone this repo and source =etc/profile.d/git-colon-path-support.$SHELL= at
@@ -73,6 +96,13 @@ shell startup where =$SHELL= is either =bash= or =zsh=.
 
 Run =make= and add =${this_repo}/share/man= to =MANPATH= to get =man
 git-colon-paths=.
+
+* Testing
+
+Run =make test=.  This uses =pexpect= to create a BASH shell linked to a
+pseudoterminal.  It's pretty cool but it can be complicated.  When something is
+not working, run the tests with =tail -f test/test_log.txt= running in a
+separate shell.
 
 * Caveats
 
