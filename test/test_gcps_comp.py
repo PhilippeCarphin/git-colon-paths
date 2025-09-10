@@ -7,11 +7,19 @@ fmt="[{levelname} - {funcName}] {message}"
 logging.basicConfig( format=fmt, style='{',
     level=(logging.DEBUG if 'DEBUG_TESTS' in os.environ else logging.INFO)
 )
-root_dir = os.path.normpath(f"{os.path.dirname(__file__)}/../")
+root_dir = os.path.normpath(f"{os.path.dirname(os.path.realpath(__file__))}/../")
 
 bash_completion = "/opt/homebrew/share/bash-completion/bash_completion" \
     if os.uname().sysname == "Darwin" \
     else "/usr/share/bash-completion/bash_completion"
+
+# Ensure existence of empty directories that we can't track with git.
+# Normally we would create a file like `.empty` in the directory and track
+# that to ensure the directory exists but because we need the directory to
+# be really empty for testing, we have to do it this way.
+os.makedirs(f"{root_dir}/test/mock_files/cwd", exist_ok=True)
+os.makedirs(f"{root_dir}/test/mock_files/non-empty-dir/subdir", exist_ok=True)
+os.makedirs(f"{root_dir}/test/mock_files/empty-dir", exist_ok=True)
 
 c = comptest.CompletionRunner(
     init_commands=[
