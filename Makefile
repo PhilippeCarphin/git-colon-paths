@@ -13,7 +13,7 @@ share/man/man1/git-colon-paths.1: share/man/man1/git-colon-paths.org
 
 .PHONY: test
 test:
-	python3 test/test_gcps_comp.py
+	python3 -u test/test_gcps_comp.py
 
 
 doc:share/man/man1/git-colon-paths.1 share/man/man7/git-colon-paths.7
