@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# The implementation of `_cd` in bash-completion 2.12+ is
+#   _cd(){
+#       declare -F _comp_cmd_cd &>/dev/null || __load_completion cd
+#       _comp_cmd_cd "$@"
+#   }
+# which causes `__load_completion cd` which resets the completion spec for
+# cd, undoing a potential `complete -F _gcps_complete_cd cd` that we could have
+# done.
+#
+# The _comp_cmd_cd function is defined by running `__load_completion cd`.  With
+# the following, ensure _comp_cmd_cd is defined so that calls to _cd from
+# bash-completion 2.12+ will not change the compspec for cd.
+compspec=$(complete -p cd 2>/dev/null)
+__load_completion cd
+${compspec}
+
 _gcps_complete_paths(){
     compopt -o filenames
     local cur prev words cword
@@ -25,7 +41,12 @@ _gcps_complete_cd(){
     if [[ "${cur}" == ':' ]] || [[ "${prev}" == : ]] ; then
         _gcps_complete_colon_paths -d
     else
-        _cd
+        # Prepare for when _cd disappears from bash-completion
+        if declare -F _comp_cmd_cd _cd >/dev/null 2>/dev/null ; then
+            _comp_cmd_cd
+        else
+            _cd
+        fi
         _gcps_handle_single_candidate "" -d true
     fi
 }
