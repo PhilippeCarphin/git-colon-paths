@@ -190,7 +190,7 @@ _gcps_handle_single_candidate(){
                 IFS=${OIFS}
             fi
 
-            local sub=$(find ${search_dir} -mindepth 1 -maxdepth 1 "${find_opt[@]}" -print -quit)
+            local sub=$(find -L ${search_dir} -mindepth 1 -maxdepth 1 "${find_opt[@]}" -print -quit)
 
             if [[ -n "${sub}" ]] ; then
                 # Completion should continue, do not add a space
